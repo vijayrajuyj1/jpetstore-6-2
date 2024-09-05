@@ -1,7 +1,3 @@
-petclinic jenkinsfile  end to end 
-=================================
-
-
 pipeline {
   agent any 
   stages {
@@ -20,7 +16,7 @@ pipeline {
     }
     stage('Static Code Analysis') {
       environment {
-        SONAR_URL = "http://50.19.144.223:9000"
+        SONAR_URL = "98.80.185.104:9000"
       }
       steps {
         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
@@ -30,8 +26,8 @@ pipeline {
     }
     stage('Build and Push Docker Image') {
       environment {
-        DOCKER_IMAGE = "vijayarajult2/petclinic:${BUILD_NUMBER}"
-        // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-ap/Dockerfile"
+        DOCKER_IMAGE = "vijayarajult2/jpetstore:${BUILD_NUMBER}"
+        // DOCKERFILE_LOCATION = "k8s/Dockerfile"
         REGISTRY_CREDENTIALS = credentials('docker-cred')
       }
       steps {
@@ -46,7 +42,7 @@ pipeline {
     }
     stage('Update Deployment File') {
         environment {
-            GIT_REPO_NAME = "pet-clinic-01"
+            GIT_REPO_NAME = "jpetstore-6-2"
             GIT_USER_NAME = "vijayrajuyj1"
         }
         steps {
@@ -55,8 +51,8 @@ pipeline {
                     git config user.email "vijayarajuyj1@gmail.com"
                     git config user.name "vijayrajuyj1"
                     BUILD_NUMBER=${BUILD_NUMBER}
-                    sed -i "s/{{ .Values.image.tag }}/${BUILD_NUMBER}/g" k8s/deployment.yml
-                    git add k8s/deployment.yml
+                    sed -i "s/{{ .Values.image.tag }}/${BUILD_NUMBER}/g" helm/demo1/values.yml
+                    git add helm/demo1/values.yml
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                 '''
