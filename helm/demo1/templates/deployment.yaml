@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jpetstore-deployment
+  labels:
+    app: jpetstore
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jpetstore
+  template:
+    metadata:
+      labels:
+        app: jpetstore
+    spec:
+      containers:
+        - name: jpetstore-container
+          image: vijayarajult2/jpetstore:{{ .Values.image.tag }}
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod"
